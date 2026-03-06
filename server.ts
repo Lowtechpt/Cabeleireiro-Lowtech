@@ -10,41 +10,45 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Initialize Supabase (only if keys are present)
+// Initialize Supabase (only if keys are present and valid)
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+let supabase: any = null;
 
-if (supabase) {
-  console.log("Supabase integrated successfully.");
+if (supabaseUrl && supabaseKey && supabaseUrl.startsWith('https://')) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseKey);
+    console.log("Supabase integrated successfully.");
+  } catch (e) {
+    console.error("Error initializing Supabase:", e);
+  }
 } else {
-  console.log("Supabase keys missing. Using in-memory storage (data will be lost on restart).");
+  console.log("Supabase keys missing or invalid. Using in-memory storage.");
 }
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = 3000;
 
-  app.use(express.json());
+app.use(express.json());
 
-  // In-memory store for bookings (for demo/preview)
-  // In production, use a real database like Supabase or Vercel Postgres
-  let bookings: any[] = [
-    {
-      id: "1",
-      name: "Maria Silva",
-      email: "maria@example.com",
-      phone: "912345678",
-      service: "Corte de Autor",
-      date: "2026-03-10",
-      time: "10:00",
-      status: "pending",
-      createdAt: new Date().toISOString(),
-    },
-  ];
+// In-memory store for bookings (for demo/preview)
+// In production, use a real database like Supabase or Vercel Postgres
+let bookings: any[] = [
+  {
+    id: "1",
+    name: "Maria Silva",
+    email: "maria@example.com",
+    phone: "912345678",
+    service: "Corte de Autor",
+    date: "2026-03-10",
+    time: "10:00",
+    status: "pending",
+    createdAt: new Date().toISOString(),
+  },
+];
 
-  // API Routes
-  app.get("/api/bookings", async (req, res) => {
+// API Routes
+app.get("/api/bookings", async (req, res) => {
     // Basic admin check
     const adminKey = req.headers["x-admin-key"];
     if (adminKey !== process.env.ADMIN_KEY && process.env.NODE_ENV === "production") {
@@ -139,24 +143,26 @@ async function startServer() {
     res.status(204).send();
   });
 
-  // Vite middleware for development
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
+// Vite middleware for development
+if (process.env.NODE_ENV !== "production") {
+  createViteServer({
+    server: { middlewareMode: true },
+    appType: "spa",
+  }).then((vite) => {
     app.use(vite.middlewares);
-  } else {
-    // Serve static files in production
-    app.use(express.static(path.join(__dirname, "dist")));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "dist", "index.html"));
-    });
-  }
+  });
+} else {
+  // Serve static files in production
+  app.use(express.static(path.join(__dirname, "dist")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "dist", "index.html"));
+  });
+}
 
+if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }
 
-startServer();
+export default app;
