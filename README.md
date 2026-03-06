@@ -1,20 +1,20 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Corte & Alma | Salão & Bem-Estar
 
-# Run and deploy your AI Studio app
+Website oficial do salão Corte & Alma. Um refúgio de bem-estar e cabeleireiro artesanal em Lisboa.
 
-This contains everything you need to run your app locally.
+## Tecnologias
+- React 19
+- Vite
+- Tailwind CSS 4
+- Motion (AnimatePresence)
+- Lucide React (Ícones)
 
-View your app in AI Studio: https://ai.studio/apps/95e70cfc-5dd2-404f-9aff-db52981e6304
+## Como correr localmente
+1. Clone o repositório
+2. Instale as dependências: `npm install`
+3. Inicie o servidor de desenvolvimento: `npm run dev`
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Como publicar no Vercel
+1. Ligue o seu repositório GitHub ao Vercel.
+2. O Vercel detetará automaticamente as configurações de build.
+3. Certifique-se de adicionar a variável de ambiente `ADMIN_KEY` nas definições do projeto no Vercel.

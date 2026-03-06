@@ -4,12 +4,24 @@
  */
 
 import React, { useState } from 'react';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, X, Scissors, Sparkles, Heart, MessageCircle, ArrowUpRight, Instagram, MapPin, Calendar } from 'lucide-react';
+import BookingForm from './components/BookingForm';
+import AdminDashboard from './components/AdminDashboard';
 
 type SectionId = 'hero' | 'services' | 'portfolio' | 'philosophy' | 'contact' | null;
 
 export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+    </Routes>
+  );
+}
+
+function Home() {
   const [expanded, setExpanded] = useState<SectionId>(null);
 
   const sections = [
@@ -205,12 +217,18 @@ export default function App() {
                 className="mt-16"
               >
                 {expanded === 'contact' ? (
-                  <div className="flex flex-col gap-6">
-                    <button className="bg-ink text-cream px-8 py-4 rounded-full text-lg font-bold flex items-center justify-center gap-4 hover:bg-terracotta transition-colors shadow-xl w-full md:w-fit">
-                      Reservar via WhatsApp <MessageCircle />
-                    </button>
-                    <div className="text-sm uppercase tracking-widest opacity-60 font-bold flex items-center gap-2">
-                      <MapPin size={16} /> Rua das Flores, 123 • Lisboa
+                  <div className="flex flex-col gap-12">
+                    <div className="bg-ink/5 p-8 rounded-[2rem] border border-current/10">
+                      <BookingForm />
+                    </div>
+                    
+                    <div className="flex flex-col md:flex-row gap-8 justify-between items-center opacity-60">
+                      <div className="text-sm uppercase tracking-widest font-bold flex items-center gap-2">
+                        <MapPin size={16} /> Rua das Flores, 123 • Lisboa
+                      </div>
+                      <a href="https://wa.me/351900000000" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-terracotta transition-colors font-bold uppercase tracking-widest text-sm">
+                        <MessageCircle size={16} /> WhatsApp
+                      </a>
                     </div>
                   </div>
                 ) : (
@@ -256,6 +274,14 @@ export default function App() {
           <h1 className="font-display text-lg font-bold tracking-tight">Corte & Alma</h1>
         </div>
       </div>
+
+      {/* Admin Link - Subtle */}
+      <Link 
+        to="/admin" 
+        className="fixed bottom-4 right-4 z-[150] text-[10px] uppercase tracking-widest opacity-20 hover:opacity-100 transition-opacity text-white font-mono"
+      >
+        Admin
+      </Link>
     </div>
   );
 }
