@@ -3,11 +3,23 @@ import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { createClient } from "@supabase/supabase-js";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Initialize Supabase (only if keys are present)
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+
+if (supabase) {
+  console.log("Supabase integrated successfully.");
+} else {
+  console.log("Supabase keys missing. Using in-memory storage (data will be lost on restart).");
+}
 
 async function startServer() {
   const app = express();
@@ -32,16 +44,27 @@ async function startServer() {
   ];
 
   // API Routes
-  app.get("/api/bookings", (req, res) => {
-    // Basic admin check (could be improved with real auth)
+  app.get("/api/bookings", async (req, res) => {
+    // Basic admin check
     const adminKey = req.headers["x-admin-key"];
     if (adminKey !== process.env.ADMIN_KEY && process.env.NODE_ENV === "production") {
       return res.status(401).json({ error: "Unauthorized" });
     }
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('*')
+        .order('createdAt', { ascending: false });
+      
+      if (error) return res.status(500).json({ error: error.message });
+      return res.json(data);
+    }
+
     res.json(bookings);
   });
 
-  app.post("/api/bookings", (req, res) => {
+  app.post("/api/bookings", async (req, res) => {
     const { name, email, phone, service, date, time } = req.body;
     
     if (!name || !phone || !service || !date || !time) {
@@ -60,14 +83,36 @@ async function startServer() {
       createdAt: new Date().toISOString(),
     };
 
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert([newBooking])
+        .select();
+      
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(201).json(data[0]);
+    }
+
     bookings.push(newBooking);
     res.status(201).json(newBooking);
   });
 
-  app.patch("/api/bookings/:id", (req, res) => {
+  app.patch("/api/bookings/:id", async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('bookings')
+        .update({ status })
+        .eq('id', id)
+        .select();
+      
+      if (error) return res.status(500).json({ error: error.message });
+      if (!data || data.length === 0) return res.status(404).json({ error: "Booking not found" });
+      return res.json(data[0]);
+    }
+
     const bookingIndex = bookings.findIndex((b) => b.id === id);
     if (bookingIndex === -1) {
       return res.status(404).json({ error: "Booking not found" });
@@ -77,8 +122,19 @@ async function startServer() {
     res.json(bookings[bookingIndex]);
   });
 
-  app.delete("/api/bookings/:id", (req, res) => {
+  app.delete("/api/bookings/:id", async (req, res) => {
     const { id } = req.params;
+
+    if (supabase) {
+      const { error } = await supabase
+        .from('bookings')
+        .delete()
+        .eq('id', id);
+      
+      if (error) return res.status(500).json({ error: error.message });
+      return res.status(204).send();
+    }
+
     bookings = bookings.filter((b) => b.id !== id);
     res.status(204).send();
   });
