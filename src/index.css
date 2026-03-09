@@ -12,7 +12,7 @@
 
 @layer base {
   body {
-    @apply bg-cream text-ink font-sans overflow-hidden h-screen w-screen;
+    @apply bg-cream text-ink font-sans;
   }
 }
 

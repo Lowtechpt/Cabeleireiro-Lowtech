@@ -322,7 +322,7 @@ export default function AdminDashboard() {
               ))}
               
               {Array.from({ length: firstDay }).map((_, i) => (
-                <div key={`empty-${i}`} className="aspect-square rounded-2xl bg-white/[0.02] border border-white/5 opacity-50" />
+                <div key={`empty-${i}`} className="min-h-[100px] md:min-h-[120px] rounded-2xl bg-white/[0.02] border border-white/5 opacity-50" />
               ))}
               
               {Array.from({ length: daysInMonth }).map((_, i) => {
@@ -336,31 +336,32 @@ export default function AdminDashboard() {
                   <button
                     key={day}
                     onClick={() => setSelectedDate(isSelected ? null : dateStr)}
-                    className={`aspect-square rounded-2xl border flex flex-col items-center justify-center relative transition-all ${
+                    className={`min-h-[100px] md:min-h-[120px] rounded-2xl border flex flex-col items-start justify-start p-2 md:p-3 relative transition-all overflow-hidden ${
                       isSelected 
-                        ? 'bg-terracotta border-terracotta text-white scale-105 z-10 shadow-xl' 
+                        ? 'bg-white/10 border-terracotta ring-1 ring-terracotta' 
                         : isToday
                           ? 'bg-white/10 border-white/20 hover:bg-white/20'
                           : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   >
-                    <span className={`text-lg md:text-2xl font-display ${isSelected ? 'text-white' : ''}`}>{day}</span>
+                    <span className={`text-sm md:text-lg font-display mb-2 ${isSelected ? 'text-terracotta' : ''}`}>{day}</span>
                     
-                    {dayBookings.length > 0 && (
-                      <div className="absolute bottom-2 flex gap-1">
-                        {dayBookings.slice(0, 3).map((b, idx) => (
-                          <div 
-                            key={idx} 
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              b.status === 'confirmed' ? 'bg-emerald-500' :
-                              b.status === 'cancelled' ? 'bg-red-500' :
-                              'bg-amber-500'
-                            } ${isSelected ? 'bg-white' : ''}`}
-                          />
-                        ))}
-                        {dayBookings.length > 3 && <span className="text-[8px] leading-none opacity-60">+{dayBookings.length - 3}</span>}
-                      </div>
-                    )}
+                    <div className="flex flex-col gap-1 w-full overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+                      {dayBookings.map((b, idx) => (
+                        <div 
+                          key={idx} 
+                          className={`text-[10px] md:text-xs px-1.5 py-1 rounded w-full text-left truncate ${
+                            b.status === 'confirmed' ? 'bg-emerald-500/20 text-emerald-400' :
+                            b.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                            'bg-amber-500/20 text-amber-400'
+                          }`}
+                          title={`${b.time} - ${b.name}`}
+                        >
+                          <span className="font-mono opacity-70 mr-1">{b.time}</span>
+                          {b.name.split(' ')[0]}
+                        </div>
+                      ))}
+                    </div>
                   </button>
                 );
               })}
