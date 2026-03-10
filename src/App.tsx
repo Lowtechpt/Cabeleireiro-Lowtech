@@ -275,13 +275,23 @@ function Home() {
         </div>
       </div>
 
-      {/* Admin Link - Subtle */}
-      <Link 
-        to="/admin" 
-        className="fixed bottom-4 right-4 z-[150] text-[10px] uppercase tracking-widest opacity-20 hover:opacity-100 transition-opacity text-white font-mono"
-      >
-        Admin
-      </Link>
+      {/* Admin & Branding Links - Subtle */}
+      <div className="fixed bottom-4 left-4 right-4 z-[150] flex justify-between items-center pointer-events-none">
+        <a 
+          href="https://lowtech.pt" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-[10px] uppercase tracking-widest opacity-20 hover:opacity-100 transition-opacity text-white font-mono pointer-events-auto"
+        >
+          Desenvolvido por lowtech.pt
+        </a>
+        <Link 
+          to="/admin" 
+          className="text-[10px] uppercase tracking-widest opacity-20 hover:opacity-100 transition-opacity text-white font-mono pointer-events-auto"
+        >
+          Admin
+        </Link>
+      </div>
     </div>
   );
 }

@@ -145,6 +145,16 @@ export default function AdminDashboard() {
             >
               {loading ? <Loader2 className="animate-spin" /> : 'Entrar'}
             </button>
+            <div className="text-center pt-4">
+              <a 
+                href="https://lowtech.pt" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity text-ink font-mono"
+              >
+                Desenvolvido por lowtech.pt
+              </a>
+            </div>
           </div>
         </motion.div>
       </div>
